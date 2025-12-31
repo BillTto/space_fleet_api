@@ -1,11 +1,32 @@
-from models import Spaceship
-from models import Mission
+from models import Spaceship, Mission, CrewMember
 
-ship1 = Spaceship(1, 'Apollo', 'cargo')
-ship2 = Spaceship(2, 'Apollo', 'cargo')
 
-mission1 = Mission(1, 'Moon mission', 'Explore the Moon')
-mission1.add_spaceship(ship1)
-mission1.add_spaceship(ship2)
+def demo_classes() -> None:
 
-print(mission1.spaceships)
+    ship1 = Spaceship(1, "Apollo", "cargo")
+    ship2 = Spaceship(2, "Odyssey", "research")
+
+
+    crew1 = CrewMember(1, "John Carter", "commander")
+    crew2 = CrewMember(2, "Ellen Ripley", "engineer")
+
+    print("Crew members:")
+    print(crew1)
+    print(crew2)
+
+
+    mission1 = Mission(1, "Moon mission", "exploration")
+    mission1.add_spaceship(ship1)
+    mission1.add_spaceship(ship2)
+
+    print("\nMission spaceships:")
+
+    for s in mission1.spaceships:
+        if hasattr(s, "to_dict"):
+            print(s.to_dict())
+        else:
+            print(s)
+
+
+if __name__ == "__main__":
+    demo_classes()
