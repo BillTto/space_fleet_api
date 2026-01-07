@@ -11,8 +11,8 @@ def demo_classes() -> None:
     crew2 = CrewMember(2, "Ellen Ripley", "engineer")
 
     print("Crew members:")
-    print(crew1)
-    print(crew2)
+    print(crew1.to_dict())
+    print(crew2.to_dict())
 
 
     mission1 = Mission(1, "Moon mission", "exploration")
@@ -22,10 +22,7 @@ def demo_classes() -> None:
     print("\nMission spaceships:")
 
     for s in mission1.spaceships:
-        if hasattr(s, "to_dict"):
-            print(s.to_dict())
-        else:
-            print(s)
+        print(s.to_dict())
 
 
 if __name__ == "__main__":

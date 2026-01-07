@@ -2,12 +2,8 @@ from flask import Flask, jsonify, request, abort
 
 app = Flask(__name__)
 
-# Domain models (OOП) — использую классы, а не словари.
-try:
-    from models import Spaceship, Mission  # CrewMember exists but is not used in API endpoints
-except Exception as e:
-    Spaceship = None  # type: ignore
-    Mission = None    # type: ignore
+# Domain models (ООП) — используем классы, а не словари.
+from models import Spaceship, Mission  # CrewMember exists but is not used in API endpoints
 
 # In-memory storage (for learning/demo). Data will be reset on restart.
 spaceships = []  # list[Spaceship]
@@ -42,41 +38,11 @@ def _find_mission(mission_id: int):
 
 
 def spaceship_to_dict(s) -> dict:
-    # Prefer model method if present
-    if hasattr(s, "to_dict") and callable(getattr(s, "to_dict")):
-        return s.to_dict()
-    # Fallback mapping
-    type_value = getattr(s, "type", None)
-    if type_value is None:
-        type_value = getattr(s, "type_", None)
-    return {
-        "spaceship_id": getattr(s, "spaceship_id"),
-        "name": getattr(s, "name"),
-        "type": type_value,
-        "status": getattr(s, "status"),
-    }
+    return s.to_dict()
 
 
 def mission_to_dict(m) -> dict:
-    if hasattr(m, "to_dict") and callable(getattr(m, "to_dict")):
-        return m.to_dict()
-
-    # mission.spaceships may contain objects or ids; normalize to ids
-    ships = getattr(m, "spaceships", [])
-    ship_ids = []
-    for item in ships:
-        if isinstance(item, int):
-            ship_ids.append(item)
-        else:
-            ship_ids.append(getattr(item, "spaceship_id"))
-
-    return {
-        "mission_id": getattr(m, "mission_id"),
-        "name": getattr(m, "name"),
-        "goal": getattr(m, "goal"),
-        "status": getattr(m, "status"),
-        "spaceships": ship_ids,
-    }
+    return m.to_dict()
 
 
 # ---------------------------
@@ -90,9 +56,6 @@ def get_spaceships():
 
 @app.route('/api/v1/spaceships', methods=['POST'])
 def create_spaceship():
-    if Spaceship is None:
-        abort(500)
-
     data = request.get_json(silent=True)
     if not data or 'name' not in data or 'type' not in data:
         abort(400)
@@ -165,9 +128,6 @@ def get_missions():
 
 @app.route('/api/v1/missions', methods=['POST'])
 def create_mission():
-    if Mission is None:
-        abort(500)
-
     data = request.get_json(silent=True)
     if not data or 'name' not in data or 'goal' not in data:
         abort(400)
@@ -226,11 +186,6 @@ def add_spaceship_to_mission(mission_id: int):
 # ---------------------------
 # Error handlers
 # ---------------------------
-
-
-@app.errorhandler(500)
-def internal_error(_error):
-    return jsonify({'error': 'Internal server error'}), 500
 
 @app.errorhandler(404)
 def not_found_error(_error):
